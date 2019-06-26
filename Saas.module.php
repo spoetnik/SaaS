@@ -23,7 +23,7 @@ class Saas extends WireData implements Module, ConfigurableModule {
 	public static function getModuleInfo() {
 		return array(
 			'title' => 'Saas',
-			'summary' => 'Restict acces to Pages by Saas-id.',
+			'summary' => 'Restict access to Pages by Saas-id.',
 			'version' => '0.0.1',
 			'author' => 'Martijn de Geus',
 			'href' => 'https://github.com/spoetnik/SaaS',

@@ -1,0 +1,19 @@
+{
+  "name": "spoetnik/saas",
+  "type": "pw-module",
+  "description": "Restict access to Pages by Saas-id.",
+  "keywords": [ "saas", "multitenancy",  "processwire" ],
+  "homepage": "https://github.com/spoetnik/SaaS",
+  "license": "GNU/GPL v2",
+  "authors": [
+    {
+      "name": "Martijn de Geus",
+      "email": "martijn@side-shore.nl",
+      "homepage": "https://side-shore.nl",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "hari/pw-module": "~1.0"
+  }
+}
