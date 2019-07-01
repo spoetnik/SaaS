@@ -47,6 +47,10 @@ class Saas extends WireData implements Module, ConfigurableModule {
 	 * Ready
 	 */
 	public function ready() {
+		// Check if the current user has a saas_id, add one if needed
+		if(!$this->wire('user')->saas_id) {
+			$this->AddUserToSaas($this->wire('user'));
+		}
 		// Check the saas_id on configured saas_templates
 		if(!$this->wire('user')->isSuperuser() && in_array($this->wire('page')->template->name, $this->saas_templates) ) {
 			$this->addHookAfter('Page::render', $this, 'checkAccess');
@@ -124,7 +128,7 @@ EOD;
 		$user = $this->wire('user');
 
 		// If the page has a saas_id field, give it the value of the users saas_id.
-		if($page->hasField(saas_id)) {
+		if($page->hasField('saas_id')) {
 			$page->saas_id = $user->saas_id;
 		}
 
@@ -231,6 +235,24 @@ EOD;
 			}
 		}
 		$event->arguments(1, $data);
+	}
+
+	/**
+	 * Enter saas_id to users without one
+	 * 
+	 * @param Userobject $user
+	 */
+	private function AddUserToSaas($user){
+		// The the current highest saas_id
+		$table = $this->wire('fields')->get('saas_id')->getTable();
+		$query = $this->wire('database')->query("SELECT data FROM $table ORDER BY data DESC LIMIT 1");
+		$id = $query->fetchAll(\PDO::FETCH_COLUMN);
+		if(!$id) $id=0;
+
+		//add one, and add to user's saas_id field
+		$this->wire('user')->saas_id = $id+1;
+		$this->wire('user')->save();
+
 	}
 
 	/**
