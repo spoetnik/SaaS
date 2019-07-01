@@ -48,16 +48,17 @@ class Saas extends WireData implements Module, ConfigurableModule {
 	 */
 	public function ready() {
 		// Check if the current user has a saas_id, add one if needed
-		if(!$this->wire('user')->saas_id) {
+		if(!$this->wire('user')->isSuperuser() && !$this->wire('user')->isGuest() && !$this->wire('user')->saas_id) {
 			$this->AddUserToSaas($this->wire('user'));
 		}
 		// Check the saas_id on configured saas_templates
 		if(!$this->wire('user')->isSuperuser() && in_array($this->wire('page')->template->name, $this->saas_templates) ) {
 			$this->addHookAfter('Page::render', $this, 'checkAccess');
 		}
-
-        // Add the saas_id on page save
-		$this->addHookBefore('Pages::saveReady', $this, 'restrictAccess');
+		// Add the saas_id on page save
+		if(!$this->wire('user')->isSuperuser() ) {
+			$this->addHookBefore('Pages::saveReady', $this, 'restrictAccess');
+		}
 	}
 
 	/**
@@ -246,11 +247,14 @@ EOD;
 		// The the current highest saas_id
 		$table = $this->wire('fields')->get('saas_id')->getTable();
 		$query = $this->wire('database')->query("SELECT data FROM $table ORDER BY data DESC LIMIT 1");
-		$id = $query->fetchAll(\PDO::FETCH_COLUMN);
-		if(!$id) $id=0;
-
+		$ids = $query->fetchAll(\PDO::FETCH_COLUMN);
+		$newid = 0;
+		//$ids returns an array (of 1) itterate over it, and find the highest value
+		foreach($ids as $id){
+			if($id > $newid) $newid = $id+1;
+		}
 		//add one, and add to user's saas_id field
-		$this->wire('user')->saas_id = $id+1;
+		$this->wire('user')->saas_id = $newid;
 		$this->wire('user')->save();
 
 	}
