@@ -221,7 +221,7 @@ EOD;
 						continue;
 					} else {
 
-                        $template->fields->add('saas_id');
+						$template->fields->add('saas_id');
 						$template->fields->save();
 					}
 				} else {			
@@ -271,6 +271,7 @@ EOD;
             $f->type = 'FieldtypeInteger';
 			$f->inputfield = 'InputfieldInteger';
 			$f_name = 'saas_id';
+			$f->collapsed = Inputfield::collapsedHidden;
 			$f->name = $f_name;
 			$f->label = $this->_('SaasiD to restrict access');
             $f->description = $this->_('This is used by the SaaS module to limit this user to only see the branch starting with this parent when viewing the page list in the admin. It also restricts editing access to just this branch.');
