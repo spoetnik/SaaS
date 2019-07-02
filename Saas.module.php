@@ -61,6 +61,28 @@ class Saas extends WireData implements Module, ConfigurableModule {
 		}
 	}
 
+
+	/**
+	 * Enter saas_id to users without one
+	 * 
+	 * @param Userobject $user
+	 */
+	private function AddUserToSaas($user){
+		// The the current highest saas_id
+		$table = $this->wire('fields')->get('saas_id')->getTable();
+		$query = $this->wire('database')->query("SELECT data FROM $table ORDER BY data DESC LIMIT 1");
+		$ids = $query->fetchAll(\PDO::FETCH_COLUMN);
+		$newid = 0;
+		//$ids returns an array (of 1) itterate over it, and find the highest value
+		foreach($ids as $id){
+			if($id >= $newid) $newid = $id+1;
+		}
+		//add one, and add to user's saas_id field
+		$this->wire('user')->saas_id = $newid;
+		$this->wire('user')->save();
+
+	}
+
 	/**
 	 * Check if rendered page may be accessed
 	 *
@@ -236,27 +258,6 @@ EOD;
 			}
 		}
 		$event->arguments(1, $data);
-	}
-
-	/**
-	 * Enter saas_id to users without one
-	 * 
-	 * @param Userobject $user
-	 */
-	private function AddUserToSaas($user){
-		// The the current highest saas_id
-		$table = $this->wire('fields')->get('saas_id')->getTable();
-		$query = $this->wire('database')->query("SELECT data FROM $table ORDER BY data DESC LIMIT 1");
-		$ids = $query->fetchAll(\PDO::FETCH_COLUMN);
-		$newid = 0;
-		//$ids returns an array (of 1) itterate over it, and find the highest value
-		foreach($ids as $id){
-			if($id > $newid) $newid = $id+1;
-		}
-		//add one, and add to user's saas_id field
-		$this->wire('user')->saas_id = $newid;
-		$this->wire('user')->save();
-
 	}
 
 	/**
