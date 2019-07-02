@@ -78,7 +78,7 @@ class Saas extends WireData implements Module, ConfigurableModule {
 
 		// Match pages saas_id with users saas_id
 		$matches = false;
-		if($page->saas_id == $user->saas_id){
+		if($page->saas_id === $user->saas_id){
 			$matches = true;
 		}
 		// Return if page matches user's saas_id
