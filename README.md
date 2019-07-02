@@ -4,9 +4,12 @@ Processwire module to restrict pages by a shared saas_id.
 
 ### Functionality
 
-A saas_id field is created, and added to the User-template.
+A (hidden) saas_id field is created, and added to the User-template.
 Add saas_id field to templates, by configuring this module.
+The saas_id of the user is automaticaly added to all pages the user creates.
 If the saas_id of the user, and the saas_id of the page match, access is granted.
+
+For all listings, add the selector ```saas_id=user()->saas_id``` or equevalent!!
 
 #### Support forum:
 
