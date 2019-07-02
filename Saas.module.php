@@ -48,7 +48,7 @@ class Saas extends WireData implements Module, ConfigurableModule {
 	 */
 	public function ready() {
 		// Check if the current user has a saas_id, add one if needed
-		if(!$this->wire('user')->isSuperuser() && !$this->wire('user')->isGuest() && !$this->wire('user')->saas_id) {
+		if(!$this->wire('user')->isSuperuser() && !$this->wire('user')->saas_id) {
 			$this->AddUserToSaas($this->wire('user'));
 		}
 		// Check the saas_id on configured saas_templates
@@ -68,15 +68,18 @@ class Saas extends WireData implements Module, ConfigurableModule {
 	 * @param Userobject $user
 	 */
 	private function AddUserToSaas($user){
-		// The the current highest saas_id
+		// Get the the current highest saas_id
+		// Nasty direct query, there must be a better option.
 		$table = $this->wire('fields')->get('saas_id')->getTable();
 		$query = $this->wire('database')->query("SELECT data FROM $table ORDER BY data DESC LIMIT 1");
 		$ids = $query->fetchAll(\PDO::FETCH_COLUMN);
+
 		$newid = 0;
 		//$ids returns an array (of 1) itterate over it, and find the highest value
 		foreach($ids as $id){
 			if($id >= $newid) $newid = $id+1;
 		}
+
 		//add one, and add to user's saas_id field
 		$this->wire('user')->saas_id = $newid;
 		$this->wire('user')->save();
@@ -98,8 +101,9 @@ class Saas extends WireData implements Module, ConfigurableModule {
 		// Return if action is throw 404 and this is the 404 page
 		if($this->no_access_action == 1 && $page->id === $this->wire('config')->http404PageID) return;
 
-		// Match pages saas_id with users saas_id
 		$matches = false;
+
+		// Match pages saas_id with users saas_id
 		if($page->saas_id === $user->saas_id){
 			$matches = true;
 		}
