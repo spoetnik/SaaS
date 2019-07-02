@@ -47,20 +47,19 @@ class Saas extends WireData implements Module, ConfigurableModule {
 	 * Ready
 	 */
 	public function ready() {
-		// Check if the current user has a saas_id, add one if needed
+		// Check if the current user has a saas_id, add one if needed.
 		if(!$this->wire('user')->isSuperuser() && !$this->wire('user')->saas_id) {
 			$this->AddUserToSaas($this->wire('user'));
 		}
-		// Check the saas_id on configured saas_templates
+		// Add the saas_id on page save.
+		if(!$this->wire('user')->isSuperuser() ) {
+			$this->addHookBefore('Pages::saveReady', $this, 'restrictAccess');
+		}		
+		// Check the saas_id on configured saas_templates.
 		if(!$this->wire('user')->isSuperuser() && in_array($this->wire('page')->template->name, $this->saas_templates) ) {
 			$this->addHookAfter('Page::render', $this, 'checkAccess');
 		}
-		// Add the saas_id on page save
-		if(!$this->wire('user')->isSuperuser() ) {
-			$this->addHookBefore('Pages::saveReady', $this, 'restrictAccess');
-		}
 	}
-
 
 	/**
 	 * Enter saas_id to users without one
@@ -87,12 +86,28 @@ class Saas extends WireData implements Module, ConfigurableModule {
 	}
 
 	/**
+	 * Add the saas_id to the saved page
+	 *
+	 * @param HookEvent $event
+	 */
+	protected function restrictAccess(HookEvent $event) {
+		/* @var Page $page */
+		$page = $event->arguments(0);
+		/* @var User $user */
+		$user = $this->wire('user');
+
+		// If the page has a saas_id field, give it the value of the users saas_id.
+		if($page->hasField('saas_id')) {
+			$page->saas_id = $user->saas_id;
+		}
+	}
+
+	/**
 	 * Check if rendered page may be accessed
 	 *
 	 * @param HookEvent $event
 	 */
 	protected function checkAccess(HookEvent $event) {
-
 		/* @var Page $page */
 		$page = $event->object;
 		/* @var User $user */
@@ -141,24 +156,6 @@ $message
 </html>
 EOD;
 		return $out;
-	}
-
-	/**
-	 * Add the saas_id to the saved page
-	 *
-	 * @param HookEvent $event
-	 */
-	protected function restrictAccess(HookEvent $event) {
-		/* @var Page $page */
-		$page = $event->arguments(0);
-		/* @var User $user */
-		$user = $this->wire('user');
-
-		// If the page has a saas_id field, give it the value of the users saas_id.
-		if($page->hasField('saas_id')) {
-			$page->saas_id = $user->saas_id;
-		}
-
 	}
 
 	/**
