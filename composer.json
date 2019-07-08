@@ -4,7 +4,7 @@
   "description": "Restict access to Pages by Saas-id.",
   "keywords": [ "saas", "multitenancy",  "processwire" ],
   "homepage": "https://github.com/spoetnik/SaaS",
-  "license": "GNU/GPL v2",
+  "license": "MIT",
   "authors": [
     {
       "name": "Martijn de Geus",
